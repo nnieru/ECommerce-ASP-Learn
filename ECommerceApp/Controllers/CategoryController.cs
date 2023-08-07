@@ -46,9 +46,15 @@ namespace ECommerceApp.Controllers
             return View(category);
         }
 
-        public IActionResult Delete()
+        public IActionResult Delete(int? id)
         {
-            return View("Create");
+            var category = _context.Find<Category>(id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return View(category);
         }
         
         
@@ -70,11 +76,43 @@ namespace ECommerceApp.Controllers
             if (ModelState.IsValid)
             {
                 _context.Categories.Add(category);
-                _context.SaveChanges(); 
+                _context.SaveChanges();
+                TempData["success"] = "Category created successfully!";
                 return RedirectToAction("Index","Category");
             }
 
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Category obj)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Categories.Update(obj);
+                _context.SaveChanges();
+                TempData["success"] = "Category updated successfully!";
+                return RedirectToAction("Index", "Category");
+            }
+
+            return View();
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePOST(int? id)
+        {
+            Category? category = _context.Find<Category>(id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            _context.Categories.Remove(category);
+            _context.SaveChanges();
+            TempData["success"] = "Category deleted successfully!";
+            return RedirectToAction("Index");
+
         }
     }
 }
